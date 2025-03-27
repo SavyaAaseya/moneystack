@@ -235,6 +235,7 @@ th, td {
 .transactions-table th {
   background-color: #8F87F1;
   color: white;
+  position: relative;;
 }
 
 .pill {
@@ -324,6 +325,20 @@ th, td {
 .debit-btn {
   background-color: #BF3131;
   color: white;
+}
+
+.delete-btn {
+  background: #BF3131;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: background 0.3s ease;
+}
+
+.delete-btn:hover {
+  background: darkred;
 }
 
 .view-all-btn {
@@ -426,49 +441,6 @@ color: #4CAF50; /* Green */
 /* Red color for debit (down arrow) */
 .stats-card .icon.down {
 color: #E74C3C; /* Red */
-}
-
-.transactions-table {
-width: 100%;
-border-collapse: collapse;
-margin-top: 10px;
-}
-
-.transactions-table th,
-.transactions-table td {
-padding: 10px;
-text-align: left;
-border-bottom: 1px solid #ddd;
-position: relative;
-}
-
-.transactions-table th {
-background: #f8f9fa;
-font-weight: bold;
-}
-
-.table-filter {
-border: none;
-background: #ffffff;
-padding: 3px 5px;
-margin-left: 5px;
-font-size: 14px;
-cursor: pointer;
-}
-
-.sort-button {
-border: none;
-background: none;
-font-size: 16px;
-cursor: pointer;
-margin-left: 5px;
-}
-
-.pill {
-padding: 5px 10px;
-border-radius: 12px;
-font-size: 14px;
-font-weight: bold;
 }
 
 .credit {

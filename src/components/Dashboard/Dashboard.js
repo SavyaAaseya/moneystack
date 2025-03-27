@@ -49,6 +49,13 @@ const Dashboard = () => {
     );
   };
 
+  const handleDelete = (id) => {
+    const updatedTransactions = transactions.filter((t) => t.id !== id);
+    setTransactions(updatedTransactions);
+    localStorage.setItem("transactions", JSON.stringify(updatedTransactions));
+  };
+  
+
   const processGraphData = () => {
     const groupedData = {};
     transactions.forEach(({ date, amount, type }) => {
@@ -74,19 +81,24 @@ const Dashboard = () => {
 
   const saveTransaction = () => {
     const transaction = {
+      id: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
       amount: parseFloat(amount) || 0,
       date,
       category,
       type: showModal,
     };
+    
     const existingTransactions = JSON.parse(localStorage.getItem("transactions")) || [];
     existingTransactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(existingTransactions));
+  
+    setTransactions(existingTransactions); // Update state
     setShowModal(null);
     setAmount("");
     setDate("");
     setCategory("");
   };
+  
 
   const totalCredits = transactions.filter(t => t.type === "credit").reduce((sum, t) => sum + Number(t.amount), 0);
   const totalDebits = transactions.filter(t => t.type === "debit").reduce((sum, t) => sum + Number(t.amount), 0);
@@ -169,6 +181,7 @@ const Dashboard = () => {
                     </div>
                   )}
                 </th>
+                <th>Action</th> 
               </tr>
             </thead>
             <tbody>
@@ -178,6 +191,9 @@ const Dashboard = () => {
                   <td>{t.category}</td>
                   <td><span className={`pill ${t.type === "credit" ? "credit" : "debit"}`}>{t.type}</span></td>
                   <td>{t.date}</td>
+                  <td>
+          <button className="delete-btn" onClick={() => handleDelete(t.id)}>🗑️</button>
+        </td>
                 </tr>
               ))}
             </tbody>
