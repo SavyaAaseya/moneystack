@@ -39,16 +39,21 @@ const Dashboard = () => {
   const [dateFilterOpen, setDateFilterOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
 
-  const recordsPerPage = 10;
-  const creditCategories = ["Salary", "Saving", "Others"];
+  const recordsPerPage = 5;
+  const creditCategories = ["Salary", "Saving", "Deposits", "Investments"];
   const debitCategories = [
     "Bills",
-    "Sports",
-    "Rent",
-    "Petrol",
-    "Food",
-    "Home",
+    "Eating Out",
+    "Groceries",
+    "Shopping",
     "Entertainment",
+    "Travel",
+    "Gifts",
+    "Health",
+    "Education",
+    "Transport",
+    "Others",
+    "Sports",
   ];
 
   useEffect(() => {
