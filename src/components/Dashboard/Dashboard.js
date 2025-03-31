@@ -9,6 +9,7 @@ import {
   FaFilter,
   FaTrash,
   FaPencilAlt,
+  FaDownload,
 } from "react-icons/fa";
 import {
   LineChart,
@@ -22,6 +23,10 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import Papa from "papaparse";
+
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(null);
   const [amount, setAmount] = useState("");
@@ -38,6 +43,7 @@ const Dashboard = () => {
   const [filterTypeOpen, setFilterTypeOpen] = useState(false);
   const [dateFilterOpen, setDateFilterOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(null);
 
   const recordsPerPage = 5;
   const creditCategories = ["Salary", "Saving", "Deposits", "Investments"];
@@ -64,6 +70,10 @@ const Dashboard = () => {
   }, [showTable]);
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredTransactions]);
+
+  useEffect(() => {
     let updatedTransactions = [...transactions];
     if (filterType) {
       updatedTransactions = updatedTransactions.filter(
@@ -83,8 +93,45 @@ const Dashboard = () => {
     setFilteredTransactions(updatedTransactions);
   }, [filterType, selectedCategories, sortDateAsc, transactions]);
 
+  const exportToCSV = () => {
+    const filteredTransactions = applyFilters(transactions); // Only export visible data
+    const csv = Papa.unparse(filteredTransactions);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "transactions.csv");
+  };
+
+  const exportToExcel = () => {
+    const filteredTransactions = applyFilters(transactions);
+    const worksheet = XLSX.utils.json_to_sheet(filteredTransactions);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, "transactions.xlsx");
+  };
+
+  // Helper function to apply active filters
+  const applyFilters = (data) => {
+    return data.filter((txn) => {
+      if (filterType && txn.type !== filterType) return false;
+      if (
+        selectedCategories.length &&
+        !selectedCategories.includes(txn.category)
+      )
+        return false;
+      return true;
+    });
+  };
+
   const toggleCategoryFilter = () => {
     setCategoryFilterOpen(!categoryFilterOpen);
+  };
+
+  const toggleMenu = (id) => {
+    setMenuOpen((prev) => (prev === id ? null : id));
   };
 
   const handleCategorySelect = (category) => {
@@ -145,42 +192,86 @@ const Dashboard = () => {
     setShowModal(transaction.type); // Open the modal
   };
 
-  const saveTransaction = () => {
-    if (!amount || !date || !category) return; // Validation
+  const [attachment, setAttachment] = useState(null);
 
-    if (editingTransaction) {
-      // Editing an existing transaction
-      const updatedTransactions = transactions.map((t) =>
-        t.id === editingTransaction.id ? { ...t, amount, date, category } : t
-      );
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    if (!files.length) return;
 
-      setTransactions(updatedTransactions);
-      localStorage.setItem("transactions", JSON.stringify(updatedTransactions));
-      setEditingTransaction(null);
-    } else {
-      // Adding a new transaction
-      const transaction = {
-        id: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        amount: parseFloat(amount) || 0,
-        date,
-        category,
-        type: showModal,
-      };
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+    ];
 
-      const existingTransactions =
-        JSON.parse(localStorage.getItem("transactions")) || [];
-      existingTransactions.push(transaction);
-      setTransactions(existingTransactions);
-      localStorage.setItem(
-        "transactions",
-        JSON.stringify(existingTransactions)
+    const filteredFiles = files.filter((file) =>
+      allowedTypes.includes(file.type)
+    );
+
+    if (filteredFiles.length !== files.length) {
+      alert(
+        "Some files were ignored. Only JPG, PNG, XLS, and XLSX files are allowed."
       );
     }
 
+    const transactionId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+    // Rename & Store in LocalStorage
+    const storedFiles = filteredFiles.map((file) => {
+      const newFileName = `${transactionId}-${file.name}`;
+      const reader = new FileReader();
+
+      reader.readAsDataURL(file); // Convert file to base64
+      reader.onload = () => {
+        localStorage.setItem(newFileName, reader.result); // Save as base64
+      };
+
+      return { name: newFileName, url: `localStorage:${newFileName}` };
+    });
+
+    setAttachment(storedFiles);
+  };
+
+  const saveTransaction = () => {
+    if (!amount.trim() || !date || !category) {
+      alert("All fields (Amount, Date, and Category) are mandatory!");
+      return;
+    }
+
+    const transactionId = editingTransaction
+      ? editingTransaction.id
+      : `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+    const transaction = {
+      id: transactionId,
+      amount: parseFloat(amount) || 0,
+      date,
+      category,
+      type: showModal,
+      attachment, // Already processed in handleFileChange
+    };
+
+    let existingTransactions =
+      JSON.parse(localStorage.getItem("transactions")) || [];
+
+    if (editingTransaction) {
+      existingTransactions = existingTransactions.map((t) =>
+        t.id === editingTransaction.id ? transaction : t
+      );
+    } else {
+      existingTransactions.push(transaction);
+    }
+
+    setTransactions(existingTransactions);
+    localStorage.setItem("transactions", JSON.stringify(existingTransactions));
+
+    // Reset
     setShowModal(null);
     setAmount("");
     setDate("");
     setCategory("");
+    setAttachment([]);
   };
 
   const totalCredits = transactions
@@ -198,6 +289,8 @@ const Dashboard = () => {
     lastIndex
   );
   const totalPages = Math.ceil(filteredTransactions.length / recordsPerPage);
+
+  /* Import */
 
   return (
     <div className="dashboard-container">
@@ -262,6 +355,14 @@ const Dashboard = () => {
       {showTable && (
         <div className="card-common viewall-container">
           <h2>All Transactions</h2>
+          <div>
+            <button className="button-primary" onClick={exportToCSV}>
+              Export to CSV
+            </button>
+            <button className="button-secondary" onClick={exportToExcel}>
+              Export to Excel
+            </button>
+          </div>
           <table className="transactions-table">
             <thead>
               <tr>
@@ -337,7 +438,7 @@ const Dashboard = () => {
                     </div>
                   )}
                 </th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -355,16 +456,46 @@ const Dashboard = () => {
                     </span>
                   </td>
                   <td>{t.date}</td>
-                  <td>
-                    <button className="atn-btn" onClick={() => handleEdit(t)}>
-                      <FaPencilAlt className="icon" />
-                    </button>
-                    <button
-                      className="atn-btn"
-                      onClick={() => handleDelete(t.id)}
-                    >
-                      <FaTrash className="icon" />
-                    </button>
+                  <td className="actions-cell">
+                    <div className="menu-container">
+                      <button onClick={() => toggleMenu(t.id)}>⋮</button>
+                      {menuOpen === t.id && (
+                        <div className="menu">
+                          <button
+                            className="dd-btn"
+                            onClick={() => handleEdit(t)}
+                          >
+                            <FaPencilAlt className="icon" />
+                            Edit
+                          </button>
+                          <button
+                            className="dd-btn"
+                            onClick={() => handleDelete(t.id)}
+                          >
+                            <FaTrash className="icon" />
+                            Delete
+                          </button>
+
+                          {Array.isArray(t.attachment) &&
+                          t.attachment.length > 0
+                            ? t.attachment.map((file, idx) => (
+                                <a
+                                  key={idx}
+                                  href={file.url}
+                                  className="dd-btn"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <FaDownload className="marginR10" size={16} />
+                                  {file.name.includes("image")
+                                    ? "View Image"
+                                    : "Attachment"}
+                                </a>
+                              ))
+                            : null}
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -481,6 +612,14 @@ const Dashboard = () => {
                 </option>
               ))}
             </select>
+            <input
+              className="input-styles"
+              placeholder="Attachment (optional)"
+              type="file"
+              accept=".jpg,.jpeg,.png,.xls,.xlsx"
+              onChange={handleFileChange}
+            />
+            {attachment && <p>Attached File: {attachment.name}</p>}
             <button className="save-btn" onClick={saveTransaction}>
               {editingTransaction ? "Update" : "Save"}
             </button>{" "}

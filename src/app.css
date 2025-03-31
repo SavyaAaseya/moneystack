@@ -145,6 +145,7 @@ textarea {
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
   outline: none;
+  display: block;
 }
 
 /* 4.3 Cards */
@@ -637,6 +638,64 @@ td {
   width: 50%;
   height: 400px;
   margin-top: 20px;
+}
+
+/* Dropdown container */
+.menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 10;
+  width: fit-content;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Dropdown labels */
+.filter-dropdown label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 14px;
+  transition: background 0.2s ease-in-out;
+}
+
+.filter-dropdown label:hover {
+  background: #f0f0f0;
+}
+
+/* Dropdown checkboxes */
+.filter-dropdown input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Dropdown Buttons */
+.dd-btn {
+  width: fit-content;
+  min-width: 110px;
+  padding: 8px;
+  margin-top: 5px;
+  border: none;
+  background: #8f87f1;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 3px;
+  transition: background 0.2s ease-in-out;
+  display: block;
+  text-align: left;
+}
+
+.dd-btn:hover {
+  background: #6d65d8;
+}
+
+.marginR10 {
+  margin-right: 10px;
 }
 
 /* ========== Mobile Adjustments ========== */
