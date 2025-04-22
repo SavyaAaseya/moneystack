@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaPlus,
   FaMinus,
@@ -232,7 +233,7 @@ const Dashboard = () => {
 
     setAttachment(storedFiles);
   };
-
+  const navigate = useNavigate();
   const saveTransaction = () => {
     if (!amount.trim() || !date || !category) {
       alert("All fields (Amount, Date, and Category) are mandatory!");
@@ -281,6 +282,7 @@ const Dashboard = () => {
     .filter((t) => t.type === "debit")
     .reduce((sum, t) => sum + Number(t.amount), 0);
   const totalBalance = totalCredits - totalDebits;
+  localStorage.setItem("totalBalance", totalBalance.toString());
 
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
@@ -319,6 +321,9 @@ const Dashboard = () => {
           >
             <FaList className="icon" />
           </button>
+          <button className="me-btn" onClick={() => navigate("/me")}>
+            ME
+          </button>
         </div>
       </header>
 
@@ -354,15 +359,20 @@ const Dashboard = () => {
 
       {showTable && (
         <div className="card-common viewall-container">
-          <h2>All Transactions</h2>
-          <div>
-            <button className="button-primary" onClick={exportToCSV}>
-              Export to CSV
-            </button>
-            <button className="button-secondary" onClick={exportToExcel}>
-              Export to Excel
-            </button>
+          <div className="table-header">
+            <h2>All Transactions</h2>
+            <div className="button-group">
+              <button className="button-primary" onClick={exportToCSV}>
+                <FaDownload className="filter-icon marginR10" />
+                CSV
+              </button>
+              <button className="button-secondary" onClick={exportToExcel}>
+                <FaDownload className="filter-icon marginR10" />
+                Excel
+              </button>
+            </div>
           </div>
+
           <table className="transactions-table">
             <thead>
               <tr>

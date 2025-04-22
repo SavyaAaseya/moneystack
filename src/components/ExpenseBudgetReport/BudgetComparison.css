@@ -1,0 +1,102 @@
+.budget-comparison-wrapper {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.budget-comparison.card,
+.smart-insights.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.budget-comparison h2,
+.smart-insights h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.comparison-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.row.header {
+  background-color: var(--primary-color);
+  font-weight: bold;
+  text-align: left;
+}
+
+.row.green {
+  background-color: #e2f8e9;
+}
+
+.row.yellow {
+  background-color: #fff8e1;
+}
+
+.row.red {
+  background-color: #ffe6e6;
+}
+
+.pill {
+  padding: 4px 10px;
+  border-radius: 30px;
+  font-size: 12px;
+  text-align: center;
+  width: fit-content;
+}
+
+.pill.UnderBudget {
+  background-color: #c3f5ce;
+  color: #237c44;
+}
+
+.pill.Warning {
+  background-color: #fff1ba;
+  color: #a47e00;
+}
+
+.pill.OverBudget {
+  background-color: #ffcccc;
+  color: #a30000;
+}
+
+/* Smart Insights Section */
+.smart-insights h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.insight-block ul {
+  list-style: none;
+  padding-left: 1.2rem;
+  margin: 0;
+}
+
+.insight-block ul li {
+  margin-bottom: 0.4rem;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.smart-insights li::before {
+  content: "•";
+  margin-right: 0.5rem;
+  color: #777;
+}

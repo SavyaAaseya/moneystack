@@ -1,0 +1,27 @@
+/* src/components/FinPilot/AnalyticsPanel.css */
+
+.analytics-container {
+  display: flex;
+  gap: 30px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.analytics-left,
+.analytics-right {
+  flex: 1;
+  min-width: 300px;
+}
+
+.analytics-left h3,
+.analytics-right h3 {
+  margin: 20px 0 10px;
+  color: #4a4a8a;
+}
+
+canvas {
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+}

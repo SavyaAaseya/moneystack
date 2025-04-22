@@ -418,6 +418,17 @@ td {
   margin: 20px 0;
   gap: 20px;
 }
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px; /* Adds spacing between buttons */
+}
 
 .stats-card {
   display: flex;
@@ -698,6 +709,12 @@ td {
   margin-right: 10px;
 }
 
+.display-flex-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
 /* ========== Mobile Adjustments ========== */
 @media (max-width: 768px) {
   /* Center and Stack Dashboard Buttons */
@@ -762,4 +779,89 @@ td {
   .display-flex {
     display: block;
   }
+}
+
+@media (max-width: 768px) {
+  .flex-wrapper {
+    flex-direction: column;
+  }
+
+  .left-pane,
+  .right-pane {
+    flex: 1 1 100%;
+  }
+}
+
+/* src/styles/Savvy.css */
+
+.savvy-container {
+  padding: 2rem;
+  background-color: #f9faff;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  margin: 2rem 0 1rem;
+  color: #8f87f1;
+  border-left: 4px solid #c68efd;
+  padding-left: 10px;
+}
+
+.budget-plan-box,
+.budget-breakdown-box {
+  background-color: #fff;
+  border: 1px solid #dedede;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.budget-plan-box p,
+.budget-breakdown-box p {
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+.insight-list {
+  list-style-type: "💡 ";
+  padding-left: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.insight-list li {
+  margin-bottom: 0.75rem;
+  background-color: #f4f0ff;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #e9a5f1;
+  border-radius: 6px;
+}
+
+.analytics-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.analytics-box {
+  flex: 1 1 300px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.analytics-box h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #6c63ff;
+}
+
+.analytics-box p {
+  font-size: 0.95rem;
+  margin: 0.25rem 0;
 }
