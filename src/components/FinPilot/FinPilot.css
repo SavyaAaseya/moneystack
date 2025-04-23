@@ -199,6 +199,11 @@ input[type="text"] {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
+  .finpilot-container {
+    margin: auto 10px;
+    padding: 30px;
+  }
+
   .finance-form-container {
     flex-direction: column;
   }

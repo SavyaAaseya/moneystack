@@ -1,18 +1,28 @@
 /* src/components/FinPilot/AnalyticsPanel.css */
 
 .analytics-container {
-  display: flex;
   gap: 30px;
   margin-top: 40px;
   flex-wrap: wrap;
 }
-
+.analytics-section {
+  max-height: 350px;
+  max-width: 600px;
+}
+.grid-two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
 .analytics-left,
 .analytics-right {
   flex: 1;
   min-width: 300px;
 }
-
+h3 {
+  display: block;
+}
 .analytics-left h3,
 .analytics-right h3 {
   margin: 20px 0 10px;
