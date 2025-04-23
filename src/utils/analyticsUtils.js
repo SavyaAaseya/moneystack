@@ -110,18 +110,25 @@ export function getProjectedCashFlow(transactions = []) {
 
 // 4. Peer Comparison
 export function getPeerComparison(transactions) {
-  const totalUserSpend = transactions
-    .filter((t) => t.type === "debit")
-    .reduce((acc, t) => acc + Number(t.amount), 0);
+  // Get financeData from localStorage (saved from FinPilot form)
+  const financeData = JSON.parse(localStorage.getItem("financeData")) || {
+    salary: 0,
+    savings: 0,
+  };
 
-  const peerAverage = 30000; // sample benchmark
+  // Calculate monthly savings as per salary and savings percentage
+  const userSavings =
+    (Number(financeData.salary) * Number(financeData.savings)) / 100;
+
+  // Replace static peer benchmark with a sample for now (can be dynamic later)
+  const peerAverage = Number(financeData.salary) * 0.35; // Peers save ~35% of salary
 
   return {
-    labels: ["You", "Peers"],
+    labels: ["Your Savings", "Peer Average"],
     datasets: [
       {
-        label: "Monthly Spend",
-        data: [totalUserSpend, peerAverage],
+        label: "Monthly Savings",
+        data: [userSavings, peerAverage],
         backgroundColor: ["#8f87f1", "#bbb"],
       },
     ],

@@ -224,6 +224,52 @@ input[type="text"] {
   .goal-details {
     width: 100%;
   }
+  .grid-two-columns {
+    grid-template-columns: 1fr;
+  }
+}
+/* ========== Responsive Table for Budget Comparison ========== */
+@media (max-width: 768px) {
+  .comparison-table {
+    gap: 0.5rem;
+  }
+
+  .row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "category status"
+      "budgeted spent";
+    row-gap: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 13px;
+  }
+
+  .row span:nth-child(1) {
+    grid-area: category;
+    font-weight: bold;
+  }
+
+  .row span:nth-child(2) {
+    grid-area: budgeted;
+  }
+
+  .row span:nth-child(3) {
+    grid-area: spent;
+  }
+
+  .row span:nth-child(4) {
+    grid-area: status;
+    justify-self: end;
+  }
+
+  .pill {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+
+  .row.header {
+    display: none; /* Hide header row on small screens */
+  }
 }
 
 /* ---------- Animations ---------- */

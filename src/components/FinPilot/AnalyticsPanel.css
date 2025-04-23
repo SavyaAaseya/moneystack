@@ -29,9 +29,8 @@ h3 {
   color: #4a4a8a;
 }
 
-canvas {
-  background: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+@media (max-width: 768px) {
+  .grid-two-columns {
+    grid-template-columns: 1fr;
+  }
 }
