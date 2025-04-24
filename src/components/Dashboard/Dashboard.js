@@ -20,8 +20,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  PieChart,
-  Pie,
+  BarChart,
+  Bar,
   Cell,
 } from "recharts";
 import * as XLSX from "xlsx";
@@ -560,25 +560,20 @@ const Dashboard = () => {
         <div className="graph-container card-common">
           <h3 className="dashboard-heading">Spending by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={processPieChartData()}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={100}
-                fill="#8884d8"
-                label
-              >
+            <BarChart data={processPieChartData()}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" fill="#8f87f1">
                 {processPieChartData().map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
                   />
                 ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
