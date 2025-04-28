@@ -7,6 +7,7 @@ import "../FinPilot/FinPilot.css";
 import BudgetComparison from "../ExpenseBudgetReport/ExpenseBudgetReport";
 import SpendingTrendChart from "../ExpenseBudgetReport/SpendingTrendChart";
 import AnalyticsPanel from "../../utils/AnalyticsPanel";
+import { useNavigate } from "react-router-dom";
 
 const GoalsSection = () => {
   const [goals, setGoals] = useState(() => {
@@ -142,6 +143,28 @@ const GoalsSection = () => {
 
 /* --------------------------------------- */
 const FinPilot = () => {
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showLogin, setShowLogin] = useState(true);
+  useEffect(() => {
+    // Automatically open login dialog when arriving
+    setShowLogin(true);
+  }, []);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    // Hardcoded Username/Password for now
+    if (username === "pro" && password === "Crazy123") {
+      setIsAuthenticated(true);
+      setShowLogin(false);
+    } else {
+      alert("Invalid Credentials");
+    }
+  };
+
   const [showForm, setShowForm] = useState(false);
   const [financeData, setFinanceData] = useState({
     salary: "",
@@ -179,89 +202,137 @@ const FinPilot = () => {
   /* Goal Section logics */
 
   return (
-    <div className="finpilot-container">
-      <h1>
-        Welcome to <span className="highlight">FinPilot</span>
-      </h1>{" "}
-      <p>Your personal finance analytics and insights hub.</p>
-      <button className="personalize-btn" onClick={() => setShowForm(true)}>
-        Personalize Finances
-      </button>
-      {showForm && (
-        <div className="finance-form-container">
-          <div className="finance-left">
-            <h2>Customize Budget Plan</h2>
-            <form onSubmit={handleSubmit}>
-              <label>Budget Split (%):</label>
-              <div className="budget-split-row">
-                <div>
-                  <label>Essentials:</label>
-                  <input
-                    type="number"
-                    name="essentials"
-                    value={financeData.essentials}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label>Wants:</label>
-                  <input
-                    type="number"
-                    name="wants"
-                    value={financeData.wants}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label>Savings:</label>
-                  <input
-                    type="number"
-                    name="savings"
-                    value={financeData.savings}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <label>Monthly Salary:</label>
+    <div className="finpilot-page">
+      {/* Show login modal if not authenticated */}
+      {!isAuthenticated && showLogin && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Login Required</h2>
+            <form onSubmit={handleLogin}>
               <input
-                type="number"
-                name="salary"
-                value={financeData.salary}
-                onChange={handleChange}
-                required
+                className="input-styles"
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
-
-              <div className="form-buttons">
-                <button type="submit" className="submit-btn">
-                  Save Plan
-                </button>
-                <button
-                  type="button"
-                  className="close-btn"
-                  onClick={() => setShowForm(false)}
-                >
-                  Close
-                </button>
-              </div>
+              <input
+                className="input-styles"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button type="submit" className="save-btn">
+                Login
+              </button>
+              <button
+                type="button"
+                className="close-btn"
+                onClick={() => {
+                  setShowLogin(false);
+                  navigate("/"); // ✅ Correct use of navigate
+                }}
+              >
+                Cancel
+              </button>
             </form>
-          </div>
-          <div className="finance-right">
-            <Lottie options={defaultOptions} height={300} width={300} />
           </div>
         </div>
       )}
-      <div className="display-flex-wrapper">
-        <GoalsSection />
-        <SpendingTrendChart />
-      </div>
-      <BudgetComparison />
-      <div>
-        <AnalyticsPanel />
-      </div>
+
+      {/* Actual FinPilot page content after login */}
+      {isAuthenticated && (
+        <>
+          <div className="finpilot-container">
+            <h1>
+              Welcome to <span className="highlight">FinPilot</span>
+            </h1>{" "}
+            <p>Your personal finance analytics and insights hub.</p>
+            <button
+              className="personalize-btn"
+              onClick={() => setShowForm(true)}
+            >
+              Personalize Finances
+            </button>
+            {showForm && (
+              <div className="finance-form-container">
+                <div className="finance-left">
+                  <h2>Customize Budget Plan</h2>
+                  <form onSubmit={handleSubmit}>
+                    <label>Budget Split (%):</label>
+                    <div className="budget-split-row">
+                      <div>
+                        <label>Essentials:</label>
+                        <input
+                          type="number"
+                          name="essentials"
+                          value={financeData.essentials}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label>Wants:</label>
+                        <input
+                          type="number"
+                          name="wants"
+                          value={financeData.wants}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label>Savings:</label>
+                        <input
+                          type="number"
+                          name="savings"
+                          value={financeData.savings}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <label>Monthly Salary:</label>
+                    <input
+                      type="number"
+                      name="salary"
+                      value={financeData.salary}
+                      onChange={handleChange}
+                      required
+                    />
+
+                    <div className="form-buttons">
+                      <button type="submit" className="submit-btn">
+                        Save Plan
+                      </button>
+                      <button
+                        type="button"
+                        className="close-btn"
+                        onClick={() => setShowForm(false)}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                <div className="finance-right">
+                  <Lottie options={defaultOptions} height={300} width={300} />
+                </div>
+              </div>
+            )}
+            <div className="display-flex-wrapper">
+              <GoalsSection />
+              <SpendingTrendChart />
+            </div>
+            <BudgetComparison />
+            <div>
+              <AnalyticsPanel />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
