@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   FaPlus,
   FaMinus,
@@ -27,6 +27,7 @@ import {
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
+import logo from "../../assets/logo.png";
 
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(null);
@@ -59,9 +60,28 @@ const Dashboard = () => {
     "Health",
     "Education",
     "Transport",
+    "Recharges",
+    "Subscriptions",
     "Others",
     "Sports",
+    "Gym",
+    "Hobbies",
   ];
+  useEffect(() => {
+    const savedTransactions =
+      JSON.parse(localStorage.getItem("transactions")) || [];
+    setTransactions(savedTransactions);
+    setFilteredTransactions(savedTransactions);
+
+    // 🔄 Load custom categories from localStorage
+    const customCredits =
+      JSON.parse(localStorage.getItem("customCreditCategories")) || [];
+    const customDebits =
+      JSON.parse(localStorage.getItem("customDebitCategories")) || [];
+
+    creditCategories.push(...customCredits);
+    debitCategories.push(...customDebits);
+  }, [showTable]);
 
   useEffect(() => {
     const savedTransactions =
@@ -298,7 +318,10 @@ const Dashboard = () => {
     <div className="dashboard-container">
       {/* Header Section */}
       <header className="app-header">
-        <h1>Expense Manager</h1>
+        <Link to="/">
+          <img src={logo} alt="Expense Manager Logo" className="app-logo" />
+        </Link>
+
         <div className="header-buttons">
           <button
             className="credit-btn"
@@ -602,21 +625,50 @@ const Dashboard = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <select
-              className="input-styles"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="">Select Category</option>
-              {(showModal === "credit"
-                ? creditCategories
-                : debitCategories
-              ).map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+            <div className="custom-category-wrapper">
+              <input
+                type="text"
+                className="input-styles"
+                value={category}
+                placeholder="Search or add category"
+                onChange={(e) => setCategory(e.target.value)}
+                list="category-options"
+              />
+              <datalist id="category-options">
+                {[
+                  ...(showModal === "credit"
+                    ? creditCategories
+                    : debitCategories),
+                ].map((cat) => (
+                  <option key={cat} value={cat} />
+                ))}
+              </datalist>
+              {category &&
+                ![
+                  ...(showModal === "credit"
+                    ? creditCategories
+                    : debitCategories),
+                ].includes(category) && (
+                  <button
+                    className="add-category-btn"
+                    onClick={() => {
+                      const key =
+                        showModal === "credit"
+                          ? "customCreditCategories"
+                          : "customDebitCategories";
+                      const stored =
+                        JSON.parse(localStorage.getItem(key)) || [];
+                      if (!stored.includes(category)) {
+                        const updated = [...stored, category];
+                        localStorage.setItem(key, JSON.stringify(updated));
+                        alert("New category added!");
+                      }
+                    }}
+                  >
+                    + Add “{category}”
+                  </button>
+                )}
+            </div>
             <input
               className="input-styles"
               placeholder="Attachment (optional)"
