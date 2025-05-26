@@ -792,6 +792,9 @@ td {
   .button-group {
     margin-top: 10px;
   }
+  .comparison-summary {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
