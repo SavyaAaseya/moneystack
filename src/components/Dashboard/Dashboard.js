@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   FaPlus,
@@ -46,32 +46,36 @@ const Dashboard = () => {
   const [dateFilterOpen, setDateFilterOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
+  const [creditCategories, setCreditCategories] = useState([]);
+  const [debitCategories, setDebitCategories] = useState([]);
 
   const recordsPerPage = 5;
-  const creditCategories = ["Salary", "Saving", "Deposits", "Investments"];
-  const debitCategories = [
-    "Bills",
-    "Eating Out",
-    "Groceries",
-    "Shopping",
-    "Entertainment",
-    "Travel",
-    "Gifts",
-    "Health",
-    "Education",
-    "Transport",
-    "Recharges",
-    "Subscriptions",
-    "Others",
-    "Sports",
-    "Gym",
-    "Hobbies",
-  ];
+
   useEffect(() => {
     const savedTransactions =
       JSON.parse(localStorage.getItem("transactions")) || [];
     setTransactions(savedTransactions);
     setFilteredTransactions(savedTransactions);
+
+    const creditCategories = ["Salary", "Saving", "Deposits", "Investments"];
+    const debitCategories = [
+      "Bills",
+      "Eating Out",
+      "Groceries",
+      "Shopping",
+      "Entertainment",
+      "Travel",
+      "Gifts",
+      "Health",
+      "Education",
+      "Transport",
+      "Recharges",
+      "Subscriptions",
+      "Others",
+      "Sports",
+      "Gym",
+      "Hobbies",
+    ];
 
     // 🔄 Load custom categories from localStorage
     const customCredits =
@@ -81,6 +85,8 @@ const Dashboard = () => {
 
     creditCategories.push(...customCredits);
     debitCategories.push(...customDebits);
+    setCreditCategories([...customCredits]);
+    setDebitCategories([...customDebits]);
   }, [showTable]);
 
   useEffect(() => {
@@ -340,6 +346,7 @@ const Dashboard = () => {
           <button
             className="button-primary view-all-btn"
             data-tooltip="View Transactions"
+            creditCategories
             onClick={() => setShowTable(!showTable)}
           >
             <FaList className="icon" />
