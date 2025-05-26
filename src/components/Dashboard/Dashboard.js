@@ -29,7 +29,84 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import logo from "../../assets/logo.png";
+// ====== Utility Functions (move to top of file or separate file) ======
 
+const shiftDate = (date, period, offset) => {
+  const d = new Date(date);
+  switch (period) {
+    case "day":
+      d.setDate(d.getDate() + offset);
+      break;
+    case "week":
+      d.setDate(d.getDate() + 7 * offset);
+      break;
+    case "month":
+      d.setMonth(d.getMonth() + offset);
+      break;
+    case "year":
+      d.setFullYear(d.getFullYear() + offset);
+      break;
+    default:
+      break;
+  }
+  return d;
+};
+
+const filterByPeriod = (txns, date, period) => {
+  return txns.filter((t) => {
+    const txnDate = new Date(t.date);
+    switch (period) {
+      case "day":
+        return txnDate.toDateString() === date.toDateString();
+      case "week": {
+        const start = new Date(date);
+        start.setDate(start.getDate() - start.getDay()); // Sunday
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6); // Saturday
+        return txnDate >= start && txnDate <= end;
+      }
+      case "month":
+        return (
+          txnDate.getFullYear() === date.getFullYear() &&
+          txnDate.getMonth() === date.getMonth()
+        );
+      case "year":
+        return txnDate.getFullYear() === date.getFullYear();
+      default:
+        return false;
+    }
+  });
+};
+
+const getComparisonStats = (period, txns) => {
+  const now = new Date();
+  const currentPeriod = filterByPeriod(txns, now, period);
+  const prevDate = shiftDate(now, period, -1);
+  const previousPeriod = filterByPeriod(txns, prevDate, period);
+
+  const sum = (data) => ({
+    income: data
+      .filter((t) => t.type === "credit")
+      .reduce((sum, t) => sum + Number(t.amount), 0),
+    expense: data
+      .filter((t) => t.type === "debit")
+      .reduce((sum, t) => sum + Number(t.amount), 0),
+  });
+
+  const current = sum(currentPeriod);
+  const previous = sum(previousPeriod);
+  const currentSavings = current.income - current.expense;
+  const previousSavings = previous.income - previous.expense;
+
+  return {
+    current: { ...current, savings: currentSavings },
+    diff: {
+      income: current.income - previous.income,
+      expense: current.expense - previous.expense,
+      savings: currentSavings - previousSavings,
+    },
+  };
+};
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(null);
   const [amount, setAmount] = useState("");
@@ -61,83 +138,6 @@ const Dashboard = () => {
     const stats = getComparisonStats(selectedPeriod, transactions);
     setComparisonStats(stats);
   }, [selectedPeriod, transactions]);
-
-  const getComparisonStats = (period, txns) => {
-    const now = new Date();
-    const currentPeriod = filterByPeriod(txns, now, period);
-    const prevDate = shiftDate(now, period, -1);
-    const previousPeriod = filterByPeriod(txns, prevDate, period);
-
-    const sum = (data) => ({
-      income: data
-        .filter((t) => t.type === "credit")
-        .reduce((sum, t) => sum + Number(t.amount), 0),
-      expense: data
-        .filter((t) => t.type === "debit")
-        .reduce((sum, t) => sum + Number(t.amount), 0),
-    });
-
-    const current = sum(currentPeriod);
-    const previous = sum(previousPeriod);
-    const currentSavings = current.income - current.expense;
-    const previousSavings = previous.income - previous.expense;
-
-    return {
-      current: { ...current, savings: currentSavings },
-      diff: {
-        income: current.income - previous.income,
-        expense: current.expense - previous.expense,
-        savings: currentSavings - previousSavings,
-      },
-    };
-  };
-
-  const shiftDate = (date, period, offset) => {
-    const d = new Date(date);
-    switch (period) {
-      case "day":
-        d.setDate(d.getDate() + offset);
-        break;
-      case "week":
-        d.setDate(d.getDate() + 7 * offset);
-        break;
-      case "month":
-        d.setMonth(d.getMonth() + offset);
-        break;
-      case "year":
-        d.setFullYear(d.getFullYear() + offset);
-        break;
-      default:
-        break;
-    }
-    return d;
-  };
-
-  const filterByPeriod = (txns, date, period) => {
-    return txns.filter((t) => {
-      const txnDate = new Date(t.date);
-      switch (period) {
-        case "day":
-          return txnDate.toDateString() === date.toDateString();
-        case "week": {
-          const start = new Date(date);
-          start.setDate(start.getDate() - start.getDay()); // Sunday
-          const end = new Date(start);
-          end.setDate(end.getDate() + 6); // Saturday
-          return txnDate >= start && txnDate <= end;
-        }
-        case "month":
-          return (
-            txnDate.getFullYear() === date.getFullYear() &&
-            txnDate.getMonth() === date.getMonth()
-          );
-        case "year":
-          return txnDate.getFullYear() === date.getFullYear();
-        default:
-          return false;
-      }
-    });
-  };
 
   // end
 
