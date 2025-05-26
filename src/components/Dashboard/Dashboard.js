@@ -48,6 +48,7 @@ const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(null);
   const [creditCategories, setCreditCategories] = useState([]);
   const [debitCategories, setDebitCategories] = useState([]);
+  const [notes, setNotes] = useState("");
 
   const recordsPerPage = 5;
 
@@ -216,6 +217,7 @@ const Dashboard = () => {
     setAmount(transaction.amount);
     setDate(transaction.date);
     setCategory(transaction.category);
+    setNotes(transaction.notes || "");
     setShowModal(transaction.type); // Open the modal
   };
 
@@ -261,7 +263,7 @@ const Dashboard = () => {
   };
   const navigate = useNavigate();
   const saveTransaction = () => {
-    if (!amount.trim() || !date || !category) {
+    if (!amount || !date || !category) {
       alert("All fields (Amount, Date, and Category) are mandatory!");
       return;
     }
@@ -276,7 +278,8 @@ const Dashboard = () => {
       date,
       category,
       type: showModal,
-      attachment, // Already processed in handleFileChange
+      notes: notes.trim(),
+      attachment,
     };
 
     let existingTransactions =
@@ -298,6 +301,7 @@ const Dashboard = () => {
     setAmount("");
     setDate("");
     setCategory("");
+    setNotes("");
     setAttachment([]);
   };
 
@@ -428,6 +432,8 @@ const Dashboard = () => {
                     </div>
                   )}
                 </th>
+                <th>Notes</th>
+
                 <th>
                   Type{" "}
                   <FaFilter
@@ -486,6 +492,11 @@ const Dashboard = () => {
                 <tr key={i}>
                   <td>₹{Number(t.amount).toFixed(2)}</td>
                   <td>{t.category}</td>
+                  <td title={t.notes}>
+                    {t.notes && t.notes.length > 20
+                      ? `${t.notes.substring(0, 20)}...`
+                      : t.notes || "—"}
+                  </td>
                   <td>
                     <span
                       className={`pill ${
@@ -672,6 +683,13 @@ const Dashboard = () => {
                         const updated = [...stored, trimmed];
                         localStorage.setItem(key, JSON.stringify(updated));
                         alert(`New category "${trimmed}" added!`);
+
+                        // ⏱ Refresh category list in state immediately
+                        if (showModal === "credit") {
+                          setCreditCategories((prev) => [...prev, trimmed]);
+                        } else {
+                          setDebitCategories((prev) => [...prev, trimmed]);
+                        }
                       }
                     }}
                   >
@@ -679,6 +697,13 @@ const Dashboard = () => {
                   </button>
                 )}
             </div>
+            <textarea
+              className="input-styles"
+              maxLength={100}
+              placeholder="Notes (optional, max 100 chars)"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
             <input
               className="input-styles"
               placeholder="Attachment (optional)"
