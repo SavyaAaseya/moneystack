@@ -11,6 +11,7 @@ import {
   FaTrash,
   FaPencilAlt,
   FaDownload,
+  FaUpload,
 } from "react-icons/fa";
 import {
   LineChart,
@@ -323,6 +324,56 @@ const Dashboard = () => {
   const totalPages = Math.ceil(filteredTransactions.length / recordsPerPage);
 
   /* Import */
+  const importTransactions = (file) => {
+    const reader = new FileReader();
+    const fileName = file.name.toLowerCase();
+
+    if (fileName.endsWith(".csv")) {
+      reader.onload = (e) => {
+        const result = Papa.parse(e.target.result, { header: true });
+        processImportedData(result.data);
+      };
+      reader.readAsText(file);
+    } else if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+      reader.onload = (e) => {
+        const workbook = XLSX.read(e.target.result, { type: "binary" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(sheet);
+        processImportedData(data);
+      };
+      reader.readAsBinaryString(file);
+    } else {
+      alert("Only CSV or Excel files are supported.");
+    }
+  };
+  const processImportedData = (data) => {
+    const validTransactions = data
+      .filter((t) => {
+        return (
+          t.amount &&
+          t.date &&
+          t.category &&
+          (t.type === "credit" || t.type === "debit")
+        );
+      })
+      .map((t) => ({
+        id: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        amount: parseFloat(t.amount),
+        date: t.date,
+        category: t.category,
+        type: t.type,
+        notes: t.notes || "",
+        attachment: [],
+      }));
+
+    const existing = JSON.parse(localStorage.getItem("transactions")) || [];
+    const merged = [...existing, ...validTransactions];
+
+    localStorage.setItem("transactions", JSON.stringify(merged));
+    setTransactions(merged);
+    setFilteredTransactions(merged);
+    alert(`${validTransactions.length} transactions imported successfully.`);
+  };
 
   return (
     <div className="dashboard-container">
@@ -396,14 +447,36 @@ const Dashboard = () => {
           <div className="table-header">
             <h2>All Transactions</h2>
             <div className="button-group">
-              <button className="button-primary" onClick={exportToCSV}>
+              <button className="upload-btn" onClick={exportToCSV}>
                 <FaDownload className="filter-icon marginR10" />
                 CSV
               </button>
-              <button className="button-secondary" onClick={exportToExcel}>
+              <button className="upload-btn" onClick={exportToExcel}>
                 <FaDownload className="filter-icon marginR10" />
                 Excel
               </button>
+              <label className="upload-btn">
+                <FaUpload className="filter-icon marginR10" /> Transactions
+                <input
+                  type="file"
+                  accept=".csv, .xls, .xlsx, .jpg, .jpeg, .png"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      if (
+                        file.name.endsWith(".csv") ||
+                        file.name.endsWith(".xls") ||
+                        file.name.endsWith(".xlsx")
+                      ) {
+                        importTransactions(file); // For bulk import
+                      } else {
+                        handleFileChange(e); // For transaction attachments
+                      }
+                    }
+                    e.target.value = ""; // Clear for next upload
+                  }}
+                />
+              </label>
             </div>
           </div>
 
