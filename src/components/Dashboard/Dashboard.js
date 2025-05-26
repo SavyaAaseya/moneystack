@@ -85,8 +85,8 @@ const Dashboard = () => {
 
     creditCategories.push(...customCredits);
     debitCategories.push(...customDebits);
-    setCreditCategories([...customCredits]);
-    setDebitCategories([...customDebits]);
+    setCreditCategories([...creditCategories, ...customCredits]);
+    setDebitCategories([...debitCategories, ...customDebits]);
   }, [showTable]);
 
   useEffect(() => {
@@ -642,14 +642,15 @@ const Dashboard = () => {
                 list="category-options"
               />
               <datalist id="category-options">
-                {[
-                  ...(showModal === "credit"
-                    ? creditCategories
-                    : debitCategories),
-                ].map((cat) => (
+                {(showModal === "credit"
+                  ? creditCategories
+                  : debitCategories
+                ).map((cat) => (
                   <option key={cat} value={cat} />
                 ))}
               </datalist>
+
+              {/* Show "Add" button if input is non-empty and not in list */}
               {category &&
                 ![
                   ...(showModal === "credit"
@@ -665,14 +666,16 @@ const Dashboard = () => {
                           : "customDebitCategories";
                       const stored =
                         JSON.parse(localStorage.getItem(key)) || [];
-                      if (!stored.includes(category)) {
-                        const updated = [...stored, category];
+                      const trimmed = category.trim();
+
+                      if (!stored.includes(trimmed) && trimmed !== "") {
+                        const updated = [...stored, trimmed];
                         localStorage.setItem(key, JSON.stringify(updated));
-                        alert("New category added!");
+                        alert(`New category "${trimmed}" added!`);
                       }
                     }}
                   >
-                    + Add “{category}”
+                    + Add “{category.trim()}”
                   </button>
                 )}
             </div>
