@@ -50,6 +50,96 @@ const Dashboard = () => {
   const [creditCategories, setCreditCategories] = useState([]);
   const [debitCategories, setDebitCategories] = useState([]);
   const [notes, setNotes] = useState("");
+  const [selectedPeriod, setSelectedPeriod] = useState("month");
+  const [comparisonStats, setComparisonStats] = useState({
+    current: { income: 0, expense: 0, savings: 0 },
+    diff: { income: 0, expense: 0, savings: 0 },
+  });
+
+  // Week vs year vs day
+  useEffect(() => {
+    const stats = getComparisonStats(selectedPeriod, transactions);
+    setComparisonStats(stats);
+  }, [selectedPeriod, transactions]);
+
+  const getComparisonStats = (period, txns) => {
+    const now = new Date();
+    const currentPeriod = filterByPeriod(txns, now, period);
+    const prevDate = shiftDate(now, period, -1);
+    const previousPeriod = filterByPeriod(txns, prevDate, period);
+
+    const sum = (data) => ({
+      income: data
+        .filter((t) => t.type === "credit")
+        .reduce((sum, t) => sum + Number(t.amount), 0),
+      expense: data
+        .filter((t) => t.type === "debit")
+        .reduce((sum, t) => sum + Number(t.amount), 0),
+    });
+
+    const current = sum(currentPeriod);
+    const previous = sum(previousPeriod);
+    const currentSavings = current.income - current.expense;
+    const previousSavings = previous.income - previous.expense;
+
+    return {
+      current: { ...current, savings: currentSavings },
+      diff: {
+        income: current.income - previous.income,
+        expense: current.expense - previous.expense,
+        savings: currentSavings - previousSavings,
+      },
+    };
+  };
+
+  const shiftDate = (date, period, offset) => {
+    const d = new Date(date);
+    switch (period) {
+      case "day":
+        d.setDate(d.getDate() + offset);
+        break;
+      case "week":
+        d.setDate(d.getDate() + 7 * offset);
+        break;
+      case "month":
+        d.setMonth(d.getMonth() + offset);
+        break;
+      case "year":
+        d.setFullYear(d.getFullYear() + offset);
+        break;
+      default:
+        break;
+    }
+    return d;
+  };
+
+  const filterByPeriod = (txns, date, period) => {
+    return txns.filter((t) => {
+      const txnDate = new Date(t.date);
+      switch (period) {
+        case "day":
+          return txnDate.toDateString() === date.toDateString();
+        case "week": {
+          const start = new Date(date);
+          start.setDate(start.getDate() - start.getDay()); // Sunday
+          const end = new Date(start);
+          end.setDate(end.getDate() + 6); // Saturday
+          return txnDate >= start && txnDate <= end;
+        }
+        case "month":
+          return (
+            txnDate.getFullYear() === date.getFullYear() &&
+            txnDate.getMonth() === date.getMonth()
+          );
+        case "year":
+          return txnDate.getFullYear() === date.getFullYear();
+        default:
+          return false;
+      }
+    });
+  };
+
+  // end
 
   const recordsPerPage = 5;
 
@@ -689,6 +779,68 @@ const Dashboard = () => {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+      <div className="card-common comparison-summary">
+        <div className="comparison-header">
+          <h3>
+            Summary (
+            {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)})
+          </h3>
+          <select
+            className="input-styles"
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+          >
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="year">Year</option>
+          </select>
+        </div>
+
+        <div className="comparison-body">
+          <p>
+            <span
+              className={
+                comparisonStats.diff.income > 0
+                  ? "positive"
+                  : comparisonStats.diff.income < 0
+                  ? "negative"
+                  : "neutral"
+              }
+            >
+              <strong>Income:</strong>{" "}
+              {comparisonStats.diff.income >= 0 ? "▲" : "▼"} ₹
+              {Math.abs(comparisonStats.diff.income).toFixed(2)}
+            </span>
+            <span
+              className={
+                comparisonStats.diff.expense > 0
+                  ? "negative"
+                  : comparisonStats.diff.expense < 0
+                  ? "positive"
+                  : "neutral"
+              }
+            >
+              <strong>Expenses:</strong>{" "}
+              {comparisonStats.diff.expense >= 0 ? "▲" : "▼"} ₹
+              {Math.abs(comparisonStats.diff.expense).toFixed(2)}
+            </span>
+            <span
+              className={
+                comparisonStats.diff.savings > 0
+                  ? "positive"
+                  : comparisonStats.diff.savings < 0
+                  ? "negative"
+                  : "neutral"
+              }
+            >
+              <strong>Savings:</strong>{" "}
+              {comparisonStats.diff.savings >= 0 ? "▲" : "▼"} ₹
+              {Math.abs(comparisonStats.diff.savings).toFixed(2)}
+            </span>
+          </p>
         </div>
       </div>
 

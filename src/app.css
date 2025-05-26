@@ -899,3 +899,64 @@ td {
 .upload-btn input[type="file"] {
   display: none;
 }
+.comparison-summary {
+  margin: 24px 0;
+  padding: 20px 24px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease-in-out;
+  font-family: "Inter", sans-serif;
+  max-width: 50%;
+}
+
+.comparison-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.comparison-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.comparison-header select {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 0px;
+  margin-left: 10px;
+}
+
+.comparison-body {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+}
+
+.comparison-body p {
+  margin: 8px 0;
+}
+
+.comparison-body span {
+  display: inline-block;
+  margin-right: 12px;
+  font-weight: 500;
+}
+
+.comparison-body .positive {
+  color: #28a745; /* green */
+}
+
+.comparison-body .negative {
+  color: #dc3545; /* red */
+}
+
+.comparison-body .neutral {
+  color: #6c757d; /* gray */
+}
