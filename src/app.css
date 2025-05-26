@@ -785,6 +785,13 @@ td {
   .display-flex {
     display: block;
   }
+  .table-header {
+    display: block;
+    width: 100%;
+  }
+  .button-group {
+    margin-top: 10px;
+  }
 }
 
 @media (max-width: 768px) {
