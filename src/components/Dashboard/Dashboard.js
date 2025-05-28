@@ -132,6 +132,7 @@ const Dashboard = () => {
     current: { income: 0, expense: 0, savings: 0 },
     diff: { income: 0, expense: 0, savings: 0 },
   });
+  const [topCategories, setTopCategories] = useState([]);
 
   // Week vs year vs day
   useEffect(() => {
@@ -142,6 +143,34 @@ const Dashboard = () => {
   // end
 
   const recordsPerPage = 5;
+
+  //Top categories logic
+  useEffect(() => {
+    const categoryTotals = {};
+
+    transactions.forEach((t) => {
+      if (t.type === "debit") {
+        if (!categoryTotals[t.category]) categoryTotals[t.category] = 0;
+        categoryTotals[t.category] += Number(t.amount);
+      }
+    });
+
+    const totalSpending = Object.values(categoryTotals).reduce(
+      (a, b) => a + b,
+      0
+    );
+
+    const sorted = Object.entries(categoryTotals)
+      .map(([category, amount]) => ({
+        category,
+        amount,
+        percent: ((amount / totalSpending) * 100).toFixed(1),
+      }))
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 3);
+
+    setTopCategories(sorted);
+  }, [transactions]);
 
   useEffect(() => {
     const savedTransactions =
@@ -736,7 +765,7 @@ const Dashboard = () => {
         </div>
       )}
       <div className="display-flex">
-        <div className="graph-container card-common">
+        <div className="graph-container card-common comparison-summary">
           <h3 className="dashboard-heading">Credit vs Debit Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={processGraphData()}>
@@ -761,7 +790,7 @@ const Dashboard = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <div className="graph-container card-common">
+        <div className="graph-container card-common comparison-summary">
           <h3 className="dashboard-heading">Spending by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={processPieChartData()}>
@@ -781,69 +810,93 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
       </div>
-      <div className="card-common comparison-summary">
-        <div className="comparison-header">
-          <h3>
-            Summary (
-            {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)})
-          </h3>
-          <select
-            className="input-styles"
-            value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
-          >
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-            <option value="year">Year</option>
-          </select>
-        </div>
+      <div className="display-flex">
+        <div className="card-common comparison-summary">
+          <div className="comparison-header">
+            <h3>
+              Summary (
+              {selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)}
+              )
+            </h3>
+            <select
+              className="input-styles"
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+            >
+              <option value="day">Day</option>
+              <option value="week">Week</option>
+              <option value="month">Month</option>
+              <option value="year">Year</option>
+            </select>
+          </div>
 
-        <div className="comparison-body">
-          <p>
-            <span
-              className={
-                comparisonStats.diff.income > 0
-                  ? "positive"
-                  : comparisonStats.diff.income < 0
-                  ? "negative"
-                  : "neutral"
-              }
-            >
-              <strong>Income:</strong>{" "}
-              {comparisonStats.diff.income >= 0 ? "▲" : "▼"} ₹
-              {Math.abs(comparisonStats.diff.income).toFixed(2)}
-            </span>
-            <span
-              className={
-                comparisonStats.diff.expense > 0
-                  ? "negative"
-                  : comparisonStats.diff.expense < 0
-                  ? "positive"
-                  : "neutral"
-              }
-            >
-              <strong>Expenses:</strong>{" "}
-              {comparisonStats.diff.expense >= 0 ? "▲" : "▼"} ₹
-              {Math.abs(comparisonStats.diff.expense).toFixed(2)}
-            </span>
-            <span
-              className={
-                comparisonStats.diff.savings > 0
-                  ? "positive"
-                  : comparisonStats.diff.savings < 0
-                  ? "negative"
-                  : "neutral"
-              }
-            >
-              <strong>Savings:</strong>{" "}
-              {comparisonStats.diff.savings >= 0 ? "▲" : "▼"} ₹
-              {Math.abs(comparisonStats.diff.savings).toFixed(2)}
-            </span>
-          </p>
+          <div className="comparison-body">
+            <p>
+              <span
+                className={
+                  comparisonStats.diff.income > 0
+                    ? "positive"
+                    : comparisonStats.diff.income < 0
+                    ? "negative"
+                    : "neutral"
+                }
+              >
+                <strong>Income:</strong>{" "}
+                {comparisonStats.diff.income >= 0 ? "▲" : "▼"} ₹
+                {Math.abs(comparisonStats.diff.income).toFixed(2)}
+              </span>
+              <span
+                className={
+                  comparisonStats.diff.expense > 0
+                    ? "negative"
+                    : comparisonStats.diff.expense < 0
+                    ? "positive"
+                    : "neutral"
+                }
+              >
+                <strong>Expenses:</strong>{" "}
+                {comparisonStats.diff.expense >= 0 ? "▲" : "▼"} ₹
+                {Math.abs(comparisonStats.diff.expense).toFixed(2)}
+              </span>
+              <span
+                className={
+                  comparisonStats.diff.savings > 0
+                    ? "positive"
+                    : comparisonStats.diff.savings < 0
+                    ? "negative"
+                    : "neutral"
+                }
+              >
+                <strong>Savings:</strong>{" "}
+                {comparisonStats.diff.savings >= 0 ? "▲" : "▼"} ₹
+                {Math.abs(comparisonStats.diff.savings).toFixed(2)}
+              </span>
+            </p>
+          </div>
+        </div>
+        <div className="card-common comparison-summary ">
+          <h3 className="dashboard-heading">Top Spending Categories</h3>
+
+          {topCategories.length === 0 ? (
+            <p>No debit transactions yet.</p>
+          ) : (
+            topCategories.map((cat, idx) => (
+              <div key={idx} className="category-row">
+                <div className="category-title">
+                  {idx + 1}. {cat.category} — ₹{cat.amount.toFixed(2)} (
+                  {cat.percent}%)
+                </div>
+                <div className="category-bar">
+                  <div
+                    className="category-fill"
+                    style={{ width: `${cat.percent}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
-
       {/* Modal for Adding Transactions */}
       {showModal && (
         <div className="modal-overlay">
