@@ -575,41 +575,47 @@ const Dashboard = () => {
         <div className="card-common viewall-container">
           <div className="table-header">
             <h2>All Transactions</h2>
-            <div className="button-group">
-              <button className="upload-btn" onClick={exportToCSV}>
-                <FaDownload className="filter-icon marginR10" />
-                CSV
-              </button>
-              <button className="upload-btn" onClick={exportToExcel}>
-                <FaDownload className="filter-icon marginR10" />
-                Excel
-              </button>
-              <label className="upload-btn">
-                <FaUpload className="filter-icon marginR10" /> Transactions
-                <input
-                  type="file"
-                  accept=".csv, .xls, .xlsx, .jpg, .jpeg, .png"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      if (
-                        file.name.endsWith(".csv") ||
-                        file.name.endsWith(".xls") ||
-                        file.name.endsWith(".xlsx")
-                      ) {
-                        importTransactions(file); // For bulk import
-                      } else {
-                        handleFileChange(e); // For transaction attachments
-                      }
-                    }
-                    e.target.value = ""; // Clear for next upload
-                  }}
-                />
+            <div className="toggle-container">
+              <input type="checkbox" id="toggle-actions" defaultChecked />
+              <label className="toggle-button" htmlFor="toggle-actions">
+                <nav className="nav-buttons">
+                  <ul>
+                    <li title="Download CSV" onClick={exportToCSV}>
+                      <FaDownload />
+                    </li>
+                    <li title="Download Excel" onClick={exportToExcel}>
+                      <FaDownload />
+                    </li>
+                    <li title="Upload File">
+                      <label className="upload-label">
+                        <FaUpload />
+                        <input
+                          type="file"
+                          accept=".csv, .xls, .xlsx, .jpg, .jpeg, .png"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              if (
+                                file.name.endsWith(".csv") ||
+                                file.name.endsWith(".xls") ||
+                                file.name.endsWith(".xlsx")
+                              ) {
+                                importTransactions(file);
+                              } else {
+                                handleFileChange(e);
+                              }
+                            }
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                    </li>
+                    <li title="Delete All" onClick={clearAllTransactions}>
+                      <FaTrash />
+                    </li>
+                  </ul>
+                </nav>
               </label>
-              <button className="upload-btn" onClick={clearAllTransactions}>
-                <FaTrash className="filter-icon marginR10" />
-                Delete All
-              </button>
             </div>
           </div>
 
