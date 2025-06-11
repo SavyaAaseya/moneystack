@@ -296,6 +296,16 @@ const Dashboard = () => {
     localStorage.setItem("transactions", JSON.stringify(updatedTransactions));
   };
 
+  // Clear function to reset all filters
+  const clearAllTransactions = () => {
+    if (window.confirm("Are you sure you want to delete all transactions?")) {
+      localStorage.removeItem("transactions");
+      setTransactions([]);
+      setFilteredTransactions([]);
+      alert("All transactions deleted.");
+    }
+  };
+
   const processGraphData = () => {
     const groupedData = {};
     transactions.forEach(({ date, amount, type }) => {
@@ -596,6 +606,10 @@ const Dashboard = () => {
                   }}
                 />
               </label>
+              <button className="upload-btn" onClick={clearAllTransactions}>
+                <FaTrash className="filter-icon marginR10" />
+                Delete All
+              </button>
             </div>
           </div>
 
