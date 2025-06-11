@@ -610,7 +610,10 @@ const Dashboard = () => {
                         />
                       </label>
                     </li>
-                    <li title="Delete All" onClick={clearAllTransactions}>
+                    <li
+                      title="Delete All Transactions"
+                      onClick={clearAllTransactions}
+                    >
                       <FaTrash />
                     </li>
                   </ul>

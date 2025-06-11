@@ -789,6 +789,9 @@ td {
     display: block;
     width: 100%;
   }
+  .table-header h2 {
+    margin-bottom: 10px;
+  }
   .button-group {
     margin-top: 10px;
   }
@@ -1069,7 +1072,7 @@ td {
 }
 
 #toggle-actions:checked + .toggle-button {
-  width: 70px;
+  width: 57px;
 }
 
 .nav-buttons {
