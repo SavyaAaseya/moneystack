@@ -12,6 +12,7 @@ import {
   FaPencilAlt,
   FaDownload,
   FaUpload,
+  FaFileCsv,
 } from "react-icons/fa";
 import {
   LineChart,
@@ -25,6 +26,7 @@ import {
   Bar,
   Cell,
 } from "recharts";
+import { SiMicrosoftexcel } from "react-icons/si";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
@@ -581,10 +583,10 @@ const Dashboard = () => {
                 <nav className="nav-buttons">
                   <ul>
                     <li title="Download CSV" onClick={exportToCSV}>
-                      <FaDownload />
+                      <FaFileCsv />
                     </li>
                     <li title="Download Excel" onClick={exportToExcel}>
-                      <FaDownload />
+                      <SiMicrosoftexcel />
                     </li>
                     <li title="Upload File">
                       <label className="upload-label">
